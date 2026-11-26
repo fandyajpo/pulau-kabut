@@ -68,11 +68,17 @@ vercel link --project pulau-kabut --scope fandys-projects-88486d38
 vercel deploy --prod --yes --scope fandys-projects-88486d38
 ```
 
-Deploy dari commit tertentu (tanpa perlu folder lokal):
+Deploy dari branch/commit tanpa folder lokal:
 
 ```bash
 vercel api /v13/deployments --method POST --scope fandys-projects-88486d38 \
   --input <(echo '{"name":"pulau-kabut","target":"production","gitSource":{"type":"github","org":"fandyajpo","repo":"pulau-kabut","ref":"main"}}')
 ```
+
+Catatan: `git push` belum memicu deploy otomatis. Vercel masih menjawab "To link a
+GitHub repository, you need to install the GitHub integration first" — artinya Vercel
+GitHub App (https://github.com/apps/vercel) belum mencakup repo ini. Setelah app itu
+dipasang untuk akun `fandyajpo` dengan repo `pulau-kabut`, deploy otomatis langsung
+aktif. Sebelum itu, deploy dilakukan lewat perintah di atas.
 
 Proyek ini juga punya `Dockerfile`, jadi bisa dijalankan sebagai container kalau perlu.
