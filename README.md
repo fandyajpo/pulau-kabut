@@ -55,5 +55,19 @@ ke server selalu masuk akal di klien lain tanpa perlu menyinkronkan world state.
 
 ## Deploy
 
-Proyek ini punya `Dockerfile`, jadi bisa dijalankan sebagai server app. Di Vercel cukup
-import repo-nya dan deploy apa adanya (Next.js terdeteksi otomatis).
+Sudah live di Vercel: **https://pulau-kabut.vercel.app** (project `pulau-kabut`, tim
+`fandys-projects-88486d38`, framework Next.js, Output Directory kosong, Node 22.x).
+
+Deploy manual dari mesin yang punya Vercel CLI:
+
+```bash
+git clone https://github.com/fandyajpo/pulau-kabut.git
+cd pulau-kabut
+vercel link --project pulau-kabut --scope fandys-projects-88486d38
+vercel deploy --prod --yes --scope fandys-projects-88486d38
+```
+
+Supaya setiap `git push` otomatis deploy, Vercel GitHub App harus diberi akses ke repo ini
+(GitHub → Settings → Applications → Vercel → Configure → tambahkan `pulau-kabut`), lalu
+hubungkan sekali dengan `vercel git connect`. Proyek ini juga punya `Dockerfile`, jadi bisa
+dijalankan sebagai container kalau perlu.
