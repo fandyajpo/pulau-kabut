@@ -57,7 +57,8 @@ function fakeSocket(label) {
   for (let i = 0; i < 40; i += 1) {
     room.handle(watcher, JSON.stringify({ t: 's', x: i, y: 0, z: 0, ry: 0 }));
   }
-  assert.equal(b.of('state').length, 24);
+  assert.equal(a.of('state').length, 24);
+  assert.equal(b.of('state').length, 0);
 }
 
 // 5. Room penuh: pemain ke-25 ditolak.
