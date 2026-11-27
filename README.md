@@ -43,6 +43,13 @@ lib/relay.js                klien relay WebSocket (jalur utama)
 lib/net.js                  pilih jalur: relay → MQTT → /api/presence
 lib/mqtt.js                 klien MQTT 3.1.1 minimal di atas WebSocket (cadangan)
 app/api/presence/route.js   endpoint cadangan kehadiran
+app/human/page.jsx          studio manusia (bukan bagian game)
+components/HumanLab.jsx     UI inspeksi: kamera, gerak, gestur, ekspresi, cahaya
+lib/human/surface.js        loft/sweep, bobot kulit, pembalik normal
+lib/human/body.js           rangka 50 tulang + badan, tangan, kaki, wajah, pakaian
+lib/human/materials.js      kulit/kain/mata prosedural + perkiraan SSS
+lib/human/motion.js         napas, jalan, lari, duduk, gestur, ekspresi, kedip
+lib/human/lab.js            renderer studio, cahaya, kamera, loop
 relay/                      relay Cloudflare Worker + Durable Object per room
 ```
 
@@ -96,6 +103,33 @@ muncul di atas kepala karaktermu dan di atas kepala pemain lain di room itu sela
 
 Dunia dibuat deterministik dari noise yang sama di setiap klien, jadi posisi yang dikirim
 ke server selalu masuk akal di klien lain tanpa perlu menyinkronkan world state.
+
+## Studio manusia (`/human`)
+
+Halaman terpisah dari game: studi anatomi prosedural, bukan avatar low-poly.
+
+- **Rangka 50 tulang**: panggul → tulang belakang → dada → leher → kepala;
+  selangka → lengan atas → lengan bawah → tangan → 5 jari × 3 falang (ibu jari 2);
+  panggul → paha → betis → tumit → jari kaki. Bobot kulit dihitung dari jarak tiap
+  vertex ke segmen tulang (4 tulang terdekat), jadi permukaan tidak pecah saat ditekuk.
+- **Bentuk badan** dari loft irisan melintang, bukan bola/silinder terpisah: panggul,
+  pinggang, rusuk, bahu, rahang, tulang pipi, hidung, bibir, telinga, telapak, dan kaki.
+- **Wajah**: 5 morph target (senyum, cemberut, terkejut, marah, sedih), kedip lewat
+  kelopak, mata dengan iris melengkung + kornea + pantulan, alis dan bulu mata instanced.
+- **Gerak**: diam bernapas, jalan dengan heel strike–toe off dan rotasi panggul/bahu
+  berlawanan, lari, duduk di bangku, serta gestur tangan (telapak, genggam, menunjuk,
+  jempol, melambai, silang, cubit) dengan lengkung jari terpisah.
+- **Material**: kulit prosedural (pori, kerutan, roughness/normal map, clearcoat, sebaran
+  cahaya hangat sebagai perkiraan SSS) dan kain tenun; pakaian berupa mesh terpisah yang
+  mengikuti badan.
+- **Render**: WebGLRenderer + ACES, PMREM environment studio, key/fill/rim dengan bayangan
+  lembut, OrbitControls, preset kamera depan/3-4/samping/belakang/wajah/tangan/kaki,
+  preset cahaya, putar otomatis, dan kualitas adaptif.
+
+Jujur soal batasnya: ini **bukan fotorealistis**. Pori, rambut per helai, SSS sungguhan,
+lipatan kain dinamis, dan likeness wajah butuh aset hasil sculpt/scan plus blendshape yang
+di-author — bukan geometri prosedural. Yang ini studi anatomi interaktif yang bisa diputar
+dan digerakkan, bukan pengganti digital human kelas studio.
 
 ## Deploy
 
