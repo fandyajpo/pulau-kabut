@@ -10,9 +10,8 @@ const MAX_IDLE_MS = 20000;
 const DEFAULT_COLOR = '#9fe8ff';
 
 function text(value, max) {
-  return String(value == null ? '' : value)
-    .slice(0, max)
-    .trim();
+  const raw = String(value == null ? '' : value).trim();
+  return raw.slice(0, max);
 }
 
 function number(value, fallback = 0) {
@@ -59,7 +58,7 @@ export class Room {
     this.clients.set(client.id, client);
 
     send(socket, { t: 'welcome', id: client.id, room: this.name });
-    send(socket, { t: 'roster', players: this.roster() });
+    send(socket, { t: 'roster', players: this.roster(client.id) });
     this.broadcast({ t: 'join', player: publicPlayer(client) }, client.id);
 
     return client;
@@ -115,8 +114,10 @@ export class Room {
     }
   }
 
-  roster() {
-    return [...this.clients.values()].map(publicPlayer);
+  roster(exceptId) {
+    return [...this.clients.values()]
+      .filter((client) => client.id !== exceptId)
+      .map(publicPlayer);
   }
 
   broadcast(message, exceptId) {
