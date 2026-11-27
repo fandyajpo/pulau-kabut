@@ -110,8 +110,11 @@
   bottom: max(14px, env(safe-area-inset-bottom));
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 18px;
-  padding: 12px 14px;
+  gap: 10px 16px;
+  padding: 10px 12px;
+  max-height: 34vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   border: 1px solid var(--lab-line);
   border-radius: 16px;
   background: var(--lab-panel);
