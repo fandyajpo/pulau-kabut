@@ -130,7 +130,7 @@ button {
 
 .mist-meter {
   position: absolute;
-  top: max(66px, calc(env(safe-area-inset-top) + 52px));
+  top: max(88px, calc(env(safe-area-inset-top) + 74px));
   left: 16px;
   width: min(220px, 46vw);
   height: 3px;
@@ -138,6 +138,112 @@ button {
   background: rgba(203, 233, 242, 0.16);
   overflow: hidden;
   z-index: 3;
+}
+
+.crew {
+  position: absolute;
+  top: max(58px, calc(env(safe-area-inset-top) + 46px));
+  left: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.crew__dot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  background: #7ef0b4;
+  box-shadow: 0 0 10px rgba(126, 240, 180, 0.85);
+}
+
+.crew__dot--offline,
+.crew__dot--refused {
+  background: #ff9f8f;
+  box-shadow: 0 0 10px rgba(255, 159, 143, 0.7);
+}
+
+.crew__dot--connecting,
+.crew__dot--reconnecting {
+  background: #ffd79a;
+  box-shadow: 0 0 10px rgba(255, 215, 154, 0.75);
+}
+
+.crew__count {
+  font-weight: 600;
+  color: rgba(233, 246, 250, 0.92);
+  flex: none;
+}
+
+.crew__names {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* -------------------------------------------------------------- join form */
+.join {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.join__label {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(159, 232, 255, 0.72);
+}
+
+.join__input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(203, 233, 242, 0.28);
+  background: rgba(8, 21, 27, 0.55);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.join__input::placeholder {
+  color: rgba(226, 241, 246, 0.4);
+}
+
+.join__input:focus {
+  border-color: rgba(159, 232, 255, 0.72);
+}
+
+.join__colors {
+  display: flex;
+  gap: 10px;
+  padding: 2px 0;
+}
+
+.swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  opacity: 0.55;
+  transition: transform 0.15s ease, opacity 0.15s ease, border-color 0.15s ease;
+}
+
+.swatch.is-on {
+  opacity: 1;
+  border-color: rgba(255, 255, 255, 0.86);
+  transform: scale(1.08);
 }
 
 .mist-meter__fill {
