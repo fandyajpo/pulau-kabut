@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createGame } from '../lib/engine';
 import { COLORS, randomColor, randomName } from '../lib/net';
+import { getRelayConfig, sanitizeRoom } from '../lib/relay';
 
 const INITIAL_STATS = {
   score: 0,
@@ -11,6 +12,7 @@ const INITIAL_STATS = {
   players: 1,
   names: [],
   net: 'offline',
+  transport: '',
   gliding: false,
   swimming: false,
   fps: 0,
@@ -21,7 +23,14 @@ const NET_LABEL = {
   connecting: 'menyambung…',
   reconnecting: 'menyambung ulang…',
   offline: 'luring',
-  refused: 'ditolak broker',
+  refused: 'ditolak',
+  failed: 'gagal',
+};
+
+const VIA_LABEL = {
+  relay: 'relay',
+  mqtt: 'mqtt',
+  http: 'cadangan',
 };
 
 export default function Game() {
@@ -30,6 +39,7 @@ export default function Game() {
 
   const [stats, setStats] = useState(INITIAL_STATS);
   const [name, setName] = useState('');
+  const [room, setRoom] = useState('lobby');
   const [color, setColor] = useState(COLORS[0]);
   const [joined, setJoined] = useState(false);
   const [muted, setMuted] = useState(false);
@@ -45,6 +55,8 @@ export default function Game() {
 
     const savedColor = window.localStorage.getItem('pulau-kabut-color');
     setColor(COLORS.includes(savedColor) ? savedColor : randomColor());
+
+    setRoom(getRelayConfig('lobby').room);
   }, []);
 
   useEffect(() => {
@@ -72,20 +84,23 @@ export default function Game() {
       event.preventDefault();
       if (!ready) return;
 
-      const clean = (name.trim() || randomName()).slice(0, 14);
-      setName(clean);
+      const cleanName = (name.trim() || randomName()).slice(0, 14);
+      const cleanRoom = sanitizeRoom(room);
+
+      setName(cleanName);
+      setRoom(cleanRoom);
 
       try {
-        window.localStorage.setItem('pulau-kabut-name', clean);
+        window.localStorage.setItem('pulau-kabut-name', cleanName);
         window.localStorage.setItem('pulau-kabut-color', color);
       } catch (error) {
         // localStorage bisa diblokir; tidak masalah
       }
 
-      gameRef.current?.start({ name: clean, color });
+      gameRef.current?.start({ name: cleanName, color, room: cleanRoom });
       setJoined(true);
     },
-    [name, color, ready],
+    [name, room, color, ready],
   );
 
   const toggleMute = useCallback(() => {
@@ -100,8 +115,9 @@ export default function Game() {
   }, []);
 
   const progress = stats.total ? stats.score / stats.total : 0;
-  const crew = stats.names.slice(0, 4);
+  const crew = stats.names.slice(0, 3);
   const more = stats.names.length > crew.length ? ' …' : '';
+  const via = VIA_LABEL[stats.transport] || '';
 
   return (
     <main className="stage">
@@ -121,6 +137,8 @@ export default function Game() {
       <div className="crew">
         <span className={`crew__dot crew__dot--${stats.net}`} />
         <span className="crew__count">{stats.players} penjelajah</span>
+        {joined ? <span className="crew__room">#{room}</span> : null}
+        {joined && via ? <span className="crew__via">{via}</span> : null}
         <span className="crew__names">
           {joined ? `kamu ${name}` : NET_LABEL[stats.net]}
           {crew.length ? ` · ${crew.join(' · ')}${more}` : ''}
@@ -179,9 +197,26 @@ export default function Game() {
               maxLength={14}
               autoComplete="nickname"
               autoCapitalize="words"
+              enterKeyHint="next"
+              spellCheck={false}
+            />
+
+            <label className="join__label" htmlFor="explorer-room">
+              Room
+            </label>
+            <input
+              id="explorer-room"
+              className="join__input"
+              value={room}
+              onChange={(event) => setRoom(sanitizeRoom(event.target.value))}
+              placeholder="lobby"
+              maxLength={16}
+              autoCapitalize="none"
+              autoComplete="off"
               enterKeyHint="go"
               spellCheck={false}
             />
+            <p className="join__hint">Bagikan room yang sama supaya bisa bertemu teman.</p>
 
             <div className="join__colors" role="radiogroup" aria-label="Warna penjelajah">
               {COLORS.map((option) => (

@@ -1,0 +1,16 @@
+name = "pulau-kabut-relay"
+main = "src/worker.js"
+compatibility_date = "2024-11-01"
+
+# Satu Durable Object per room: semua pemain di room yang sama bertemu object
+# yang sama, jadi broadcast-nya langsung dan tidak lewat broker publik.
+[[durable_objects.bindings]]
+name = "LOBBY"
+class_name = "Lobby"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Lobby"]
+
+[observability]
+enabled = true

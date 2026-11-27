@@ -6,8 +6,9 @@ dengan pemain lain, lalu berjalan, lompat, dan meluncur di antara lembah untuk m
 
 - **Next.js 14** (App Router) + **Three.js**, tanpa aset: semua bentuk dan suara dibuat
   saat runtime.
-- **Multiplayer** lewat lobby MQTT: pemain mengisi nama di halaman pertama, lalu posisi mereka
-  bertukar ~4x/detik sehingga pemain lain terlihat di pulau yang sama.
+- **Multiplayer** lewat relay WebSocket sendiri (Cloudflare Worker + Durable Object per
+  room): pemain mengisi nama dan room di halaman pertama, lalu posisi mereka bertukar
+  sehingga pemain lain terlihat di pulau yang sama.
 
 ## Menjalankan
 
@@ -34,31 +35,53 @@ juga menyalakan audio, karena browser mensyaratkan gestur pengguna).
 
 ```
 app/page.jsx               halaman game
-components/Game.jsx         layar gabung (nama + warna) dan HUD React
+components/Game.jsx         layar gabung (nama + room + warna) dan HUD React
 lib/engine.js               renderer, fisika pemain, kamera, loop
 lib/world.js                pulau prosedural, pohon, batu, kristal, langit
 lib/audio.js                suara Web Audio (angin, langkah, lompat, kristal)
-lib/mqtt.js                 klien MQTT 3.1.1 minimal di atas WebSocket (tanpa dependency)
-lib/net.js                  lobby: publish/subscribe topik, fallback ke /api/presence
+lib/relay.js                klien relay WebSocket (jalur utama)
+lib/net.js                  pilih jalur: relay → MQTT → /api/presence
+lib/mqtt.js                 klien MQTT 3.1.1 minimal di atas WebSocket (cadangan)
 app/api/presence/route.js   endpoint cadangan kehadiran
+relay/                      relay Cloudflare Worker + Durable Object per room
 ```
 
 ## Multiplayer
 
-Halaman pertama minta **nama penjelajah** dan warna. Setelah **Gabung ke pulau**, posisi
-dikirim ~4x/detik ke satu topik MQTT dan pemain lain muncul di pulau sebagai karakter
-berlabel nama mereka. HUD atas menampilkan jumlah penjelajah beserta nama yang sedang online.
+Halaman pertama minta **nama penjelajah**, **room**, dan warna. Setelah **Gabung ke pulau**,
+posisi dikirim ke relay dan pemain lain muncul di pulau sebagai karakter berlabel nama
+mereka. HUD atas menampilkan jumlah penjelajah, room, jalur koneksi, dan nama yang online.
 
-- Broker: `wss://broker.hivemq.com:8884/mqtt` — broker uji publik HiveMQ, tanpa akun dan
-  tanpa kunci. Karena semua klien berbagi satu topik, pemain tetap saling melihat walau
-  Vercel menaruh tiap request di instance function yang berbeda; penyimpanan in-memory tidak
-  bisa melakukan itu.
-- Kalau broker tidak bisa dihubungi (jaringan kantor, broker uji sedang down), aplikasi
-  otomatis jatuh ke polling `/api/presence` yang berbasis memori instance. Di Vercel mode
-  cadangan itu bisa jadi tidak saling melihat.
-- Topiknya publik: siapa pun yang tahu `pulau-kabut/v1/lobby` bisa melihat posisi dan nama.
-  Untuk pemakaian serius, ganti `BROKER`/`TOPIC` di `lib/net.js` ke broker berautentikasi,
-  atau pindahkan lobby ke Upstash Redis / Vercel KV.
+Tiga jalur dicoba berurutan sampai satu berhasil:
+
+1. **Relay WebSocket sendiri** (`relay/`) — Cloudflare Worker + satu Durable Object per
+   room, jadi semua pemain di room yang sama bertemu object yang sama dan pesannya disiarkan
+   langsung. Ini jalur yang dipakai kalau `NEXT_PUBLIC_RELAY_URL` diisi.
+2. **Broker MQTT publik** `wss://broker.hivemq.com:8884/mqtt` — cadangan tanpa akun kalau
+   relay belum dipasang atau tidak bisa dihubungi.
+3. **Polling `/api/presence`** — cadangan terakhir, berbasis memori instance; di Vercel bisa
+   jadi tidak saling melihat.
+
+Memasang relay (sekali saja):
+
+```bash
+cd relay
+npm install
+npx wrangler login
+npx wrangler deploy
+```
+
+Lalu isi `NEXT_PUBLIC_RELAY_URL` di Vercel (Project → Settings → Environment Variables)
+dengan `wss://pulau-kabut-relay.<akun>.workers.dev/ws`, dan deploy ulang aplikasinya.
+Untuk lokal cukup `NEXT_PUBLIC_RELAY_URL=ws://127.0.0.1:8787/ws` di `.env.local` sambil
+menjalankan `npx wrangler dev` di folder `relay`.
+
+- Tanpa relay, game tetap jalan lewat MQTT, tapi topiknya publik: siapa pun yang tahu
+  `pulau-kabut/v1/<room>` bisa melihat posisi dan nama.
+- Relay bisa dikunci: `npx wrangler secret put RELAY_TOKEN`, lalu bagikan link dengan
+  `?token=<nilai>`. Detail protokol dan batasannya ada di [relay/README.md](relay/README.md).
+- Room dipilih di halaman gabung (atau `?room=kopi` di URL), jadi teman cukup diberi link
+  yang sama. Batas relay: 24 pemain per room.
 
 Dunia dibuat deterministik dari noise yang sama di setiap klien, jadi posisi yang dikirim
 ke server selalu masuk akal di klien lain tanpa perlu menyinkronkan world state.
