@@ -128,10 +128,20 @@ Bukan avatar low-poly: manusia parametrik dengan rangka dan kulit ber-bobot.
   lembut, OrbitControls, preset kamera depan/3-4/samping/belakang/wajah/tangan/kaki,
   preset cahaya, putar otomatis, dan kualitas adaptif.
 
-Di pulau, pose mengikuti keadaan pemain: diam bernapas, jalan/lari mengikuti kecepatan,
-jatuh saat di udara, meluncur saat menahan lompat, dan berenang di air. Enam penjelajah
-pertama memakai rangka penuh (warna kemeja = warna mereka); selebihnya memakai avatar
-sederhana supaya pulau tetap ringan di ponsel.
+Di pulau, pose mengikuti keadaan pemain: diam bernapas, jalan/lari mengikuti kecepatan
+(fase langkah ikut kecepatan sebenarnya, jadi kaki tidak meluncur), jatuh saat di udara,
+meluncur saat menahan lompat, dan berenang di air. Enam penjelajah pertama memakai rangka
+penuh (warna kemeja = warna mereka); selebihnya memakai avatar sederhana supaya pulau
+tetap ringan di ponsel.
+
+- Kaki menempel ke tanah: tinggi diambil dari bawah kedua kaki, badan dimiringkan mengikuti
+  kemiringan permukaan, dan lutut ditekuk dengan IK sederhana supaya telapak tidak menembus
+  atau melayang di lereng.
+- Kamera ikut menghindari pohon dan batu (raycast 20x/detik lalu menarik mendekat), dan
+  tempat spawn dicari yang tidak dekat pohon, jadi kamera tidak masuk ke dalam tajuk.
+- Warna yang kamu pilih di layar gabung dipakai untuk kemeja karakter itu sendiri.
+- Di studio `/human`, kamera otomatis mundur di layar potret supaya wajah/tangan/kaki tidak
+  terpotong, dan panel kontrol dibatasi 34vh.
 
 Jujur soal batasnya: ini **bukan fotorealistis**. Pori, rambut per helai, SSS sungguhan,
 lipatan kain dinamis, dan likeness wajah butuh aset hasil sculpt/scan plus blendshape yang
