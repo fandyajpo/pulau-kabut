@@ -1,13 +1,13 @@
 # Pulau Kabut
 
-Open world low-poly di atas pulau berkabut. Berjalan, lompat, dan meluncur di antara
-lembah untuk mengumpulkan 26 kristal cahaya — setiap kristal yang diambil mengikis kabut
-dan membuka pemandangan pulau.
+Open world low-poly di atas pulau berkabut. Isi nama penjelajah, gabung ke pulau yang sama
+dengan pemain lain, lalu berjalan, lompat, dan meluncur di antara lembah untuk mengumpulkan
+26 kristal cahaya — setiap kristal yang diambil mengikis kabut dan membuka pemandangan pulau.
 
 - **Next.js 14** (App Router) + **Three.js**, tanpa aset: semua bentuk dan suara dibuat
   saat runtime.
-- **Multiplayer** lewat `/api/presence`: posisi pemain dikirim tiap ~420 ms dan pemain lain
-  muncul sebagai penjelajah berlabel nama.
+- **Multiplayer** lewat lobby MQTT: pemain mengisi nama di halaman pertama, lalu posisi mereka
+  bertukar ~4x/detik sehingga pemain lain terlihat di pulau yang sama.
 
 ## Menjalankan
 
@@ -16,8 +16,8 @@ npm install
 npm run dev
 ```
 
-Buka http://localhost:3000, lalu tap **Mulai menjelajah** (tap pertama juga menyalakan
-audio, karena browser mensyaratkan gestur pengguna).
+Buka http://localhost:3000, isi nama penjelajah, lalu tap **Gabung ke pulau** (tap pertama
+juga menyalakan audio, karena browser mensyaratkan gestur pengguna).
 
 ## Kontrol
 
@@ -33,22 +33,32 @@ audio, karena browser mensyaratkan gestur pengguna).
 ## Struktur
 
 ```
-app/page.jsx              halaman game
-components/Game.jsx        HUD React (skor, kabut, tombol mulai/lompat)
-lib/engine.js              renderer, fisika pemain, kamera, loop
-lib/world.js               pulau prosedural, pohon, batu, kristal, langit
-lib/audio.js               suara Web Audio (angin, langkah, lompat, kristal)
-lib/net.js                 klien kehadiran pemain
-app/api/presence/route.js  endpoint kehadiran
+app/page.jsx               halaman game
+components/Game.jsx         layar gabung (nama + warna) dan HUD React
+lib/engine.js               renderer, fisika pemain, kamera, loop
+lib/world.js                pulau prosedural, pohon, batu, kristal, langit
+lib/audio.js                suara Web Audio (angin, langkah, lompat, kristal)
+lib/mqtt.js                 klien MQTT 3.1.1 minimal di atas WebSocket (tanpa dependency)
+lib/net.js                  lobby: publish/subscribe topik, fallback ke /api/presence
+app/api/presence/route.js   endpoint cadangan kehadiran
 ```
 
-## Multiplayer: yang jujur soal Vercel
+## Multiplayer
 
-`app/api/presence/route.js` menyimpan pemain di memori instance server. Di dev dan saat
-dua pemain jatuh ke instance yang sama, mereka saling terlihat; di Vercel tiap instance
-punya memori sendiri, jadi bisa jadi tidak saling melihat. Untuk multiplayer sungguhan,
-ganti isi `store` di route itu dengan **Upstash Redis / Vercel KV** (atau pindah ke
-Partykit untuk websocket) — bentuk fungsinya sengaja dibuat sesederhana itu.
+Halaman pertama minta **nama penjelajah** dan warna. Setelah **Gabung ke pulau**, posisi
+dikirim ~4x/detik ke satu topik MQTT dan pemain lain muncul di pulau sebagai karakter
+berlabel nama mereka. HUD atas menampilkan jumlah penjelajah beserta nama yang sedang online.
+
+- Broker: `wss://broker.hivemq.com:8884/mqtt` — broker uji publik HiveMQ, tanpa akun dan
+  tanpa kunci. Karena semua klien berbagi satu topik, pemain tetap saling melihat walau
+  Vercel menaruh tiap request di instance function yang berbeda; penyimpanan in-memory tidak
+  bisa melakukan itu.
+- Kalau broker tidak bisa dihubungi (jaringan kantor, broker uji sedang down), aplikasi
+  otomatis jatuh ke polling `/api/presence` yang berbasis memori instance. Di Vercel mode
+  cadangan itu bisa jadi tidak saling melihat.
+- Topiknya publik: siapa pun yang tahu `pulau-kabut/v1/lobby` bisa melihat posisi dan nama.
+  Untuk pemakaian serius, ganti `BROKER`/`TOPIC` di `lib/net.js` ke broker berautentikasi,
+  atau pindahkan lobby ke Upstash Redis / Vercel KV.
 
 Dunia dibuat deterministik dari noise yang sama di setiap klien, jadi posisi yang dikirim
 ke server selalu masuk akal di klien lain tanpa perlu menyinkronkan world state.
