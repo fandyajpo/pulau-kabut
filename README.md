@@ -120,7 +120,9 @@ Bukan avatar low-poly: manusia parametrik dengan rangka dan kulit ber-bobot.
   kelopak, mata dengan iris melengkung + kornea + pantulan, alis dan bulu mata instanced.
 - **Gerak**: diam bernapas, jalan dengan heel strike–toe off dan rotasi panggul/bahu
   berlawanan, lari, duduk di bangku, serta gestur tangan (telapak, genggam, menunjuk,
-  jempol, melambai, silang, cubit) dengan lengkung jari terpisah.
+  jempol, melambai, silang, cubit) dengan lengkung jari terpisah. Semua pose ditulis ke
+  buffer lalu dihaluskan (~9–12/detik), jadi ganti klip atau gestur tidak pernah melompat;
+  gestur blend masuk/keluar 0,18 detik dan mendarat punya redaman lutut 0,28 detik.
 - **Material**: kulit prosedural (pori, kerutan, roughness/normal map, clearcoat, sebaran
   cahaya hangat sebagai perkiraan SSS) dan kain tenun; pakaian berupa mesh terpisah yang
   mengikuti badan.
@@ -136,7 +138,7 @@ tetap ringan di ponsel.
 
 - Kaki menempel ke tanah: tinggi diambil dari bawah kedua kaki, badan dimiringkan mengikuti
   kemiringan permukaan, dan lutut ditekuk dengan IK sederhana supaya telapak tidak menembus
-  atau melayang di lereng.
+  atau melayang di lereng. Saat mendarat ada redaman lutut singkat.
 - Kamera ikut menghindari pohon dan batu (raycast 20x/detik lalu menarik mendekat), dan
   tempat spawn dicari yang tidak dekat pohon, jadi kamera tidak masuk ke dalam tajuk.
 - Warna yang kamu pilih di layar gabung dipakai untuk kemeja karakter itu sendiri.
