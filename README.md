@@ -117,7 +117,11 @@ Bukan avatar low-poly: manusia parametrik dengan rangka dan kulit ber-bobot.
 - **Rangka 50 tulang**: panggul → tulang belakang → dada → leher → kepala;
   selangka → lengan atas → lengan bawah → tangan → 5 jari × 3 falang (ibu jari 2);
   panggul → paha → betis → tumit → jari kaki. Bobot kulit dihitung dari jarak tiap
-  vertex ke segmen tulang (4 tulang terdekat), jadi permukaan tidak pecah saat ditekuk.
+  vertex ke segmen tulang (4 tulang terdekat) tetapi **dibatasi ke tulang bagian itu
+  sendiri**: celana hanya ke panggul/paha/betis, tangan hanya ke lengan bawah/tangan/jari,
+  kepala hanya ke leher/kepala. Tanpa batas itu, tepi celana sempat mendapat bobot
+  lengan bawah dan ikut tertarik saat tangan bergerak (tangan tampak menyatu dengan
+  pinggul); uji sekarang menunjukkan 0 bobot silang.
 - **Bentuk badan** dari loft irisan melintang, bukan bola/silinder terpisah: panggul,
   pinggang, rusuk, bahu, rahang, tulang pipi, hidung, bibir, telinga, telapak, dan kaki.
 - **Wajah**: 5 morph target (senyum, cemberut, terkejut, marah, sedih), kedip lewat
