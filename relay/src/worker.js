@@ -29,7 +29,8 @@ export default {
       });
     }
 
-    if (request.headers.get('Upgrade') !== 'websocket') {
+    const upgrade = String(request.headers.get('Upgrade') || '').toLowerCase();
+    if (upgrade !== 'websocket') {
       return new Response('expected websocket upgrade', { status: 426 });
     }
 
