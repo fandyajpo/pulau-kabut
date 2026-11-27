@@ -106,7 +106,9 @@ ke server selalu masuk akal di klien lain tanpa perlu menyinkronkan world state.
 
 ## Studio manusia (`/human`)
 
-Halaman terpisah dari game: studi anatomi prosedural, bukan avatar low-poly.
+Rangka yang sama dipakai di dua tempat: **studio `/human`** untuk inspeksi anatomi, dan
+**avatar pemain di pulau** (karakter yang kamu mainkan setelah join, serta penjelajah lain).
+Bukan avatar low-poly: manusia parametrik dengan rangka dan kulit ber-bobot.
 
 - **Rangka 50 tulang**: panggul → tulang belakang → dada → leher → kepala;
   selangka → lengan atas → lengan bawah → tangan → 5 jari × 3 falang (ibu jari 2);
@@ -125,6 +127,11 @@ Halaman terpisah dari game: studi anatomi prosedural, bukan avatar low-poly.
 - **Render**: WebGLRenderer + ACES, PMREM environment studio, key/fill/rim dengan bayangan
   lembut, OrbitControls, preset kamera depan/3-4/samping/belakang/wajah/tangan/kaki,
   preset cahaya, putar otomatis, dan kualitas adaptif.
+
+Di pulau, pose mengikuti keadaan pemain: diam bernapas, jalan/lari mengikuti kecepatan,
+jatuh saat di udara, meluncur saat menahan lompat, dan berenang di air. Enam penjelajah
+pertama memakai rangka penuh (warna kemeja = warna mereka); selebihnya memakai avatar
+sederhana supaya pulau tetap ringan di ponsel.
 
 Jujur soal batasnya: ini **bukan fotorealistis**. Pori, rambut per helai, SSS sungguhan,
 lipatan kain dinamis, dan likeness wajah butuh aset hasil sculpt/scan plus blendshape yang
