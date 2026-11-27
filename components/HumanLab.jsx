@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { createLab } from '../../lib/human/lab';
+import { createLab } from '../lib/human/lab';
 
 const VIEWS = [
   ['front', 'Depan'],
