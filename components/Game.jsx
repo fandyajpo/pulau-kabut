@@ -135,27 +135,31 @@ export default function Game() {
     <main className="stage">
       <canvas ref={canvasRef} className="scene" aria-label="Pulau Kabut" />
 
-      <header className="hud hud--top">
-        <div className="chip">
-          <span className="chip__dot" />
-          <strong className="chip__value">{stats.score}</strong>
-          <span className="chip__label">/ {stats.total} kristal</span>
-        </div>
-        <button type="button" className="ghost-btn" onClick={toggleMute} aria-pressed={muted}>
-          {muted ? 'Suara mati' : 'Suara nyala'}
-        </button>
-      </header>
+      {joined ? (
+        <header className="hud hud--top">
+          <div className="chip">
+            <span className="chip__dot" />
+            <strong className="chip__value">{stats.score}</strong>
+            <span className="chip__label">/ {stats.total} kristal</span>
+          </div>
+          <button type="button" className="ghost-btn" onClick={toggleMute} aria-pressed={muted}>
+            {muted ? 'Suara mati' : 'Suara nyala'}
+          </button>
+        </header>
+      ) : null}
 
-      <div className="crew">
-        <span className={`crew__dot crew__dot--${stats.net}`} />
-        <span className="crew__count">{stats.players} penjelajah</span>
-        {joined ? <span className="crew__room">#{room}</span> : null}
-        {joined && via ? <span className="crew__via">{via}</span> : null}
-        <span className="crew__names">
-          {joined ? `kamu ${name}` : NET_LABEL[stats.net]}
-          {crew.length ? ` · ${crew.join(' · ')}${more}` : ''}
-        </span>
-      </div>
+      {joined ? (
+        <div className="crew">
+          <span className={`crew__dot crew__dot--${stats.net}`} />
+          <span className="crew__count">{stats.players} penjelajah</span>
+          <span className="crew__room">#{room}</span>
+          {via ? <span className="crew__via">{via}</span> : null}
+          <span className="crew__names">
+            {`kamu ${name}`}
+            {crew.length ? ` · ${crew.join(' · ')}${more}` : ''}
+          </span>
+        </div>
+      ) : null}
 
       <div className="mist-meter" aria-hidden="true">
         <span className="mist-meter__fill" style={{ width: `${Math.round(progress * 100)}%` }} />
