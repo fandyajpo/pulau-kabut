@@ -83,6 +83,17 @@ menjalankan `npx wrangler dev` di folder `relay`.
 - Room dipilih di halaman gabung (atau `?room=kopi` di URL), jadi teman cukup diberi link
   yang sama. Batas relay: 24 pemain per room.
 
+### Chat di atas kepala
+
+Tap kolom **Katakan sesuatu…** di bawah layar, tulis pesan, lalu Enter/Kirim. Balonnya
+muncul di atas kepala karaktermu dan di atas kepala pemain lain di room itu selama ~7 detik.
+
+- Tidak ada database: relay hanya menyiarkan pesan ke pemain lain sekali, lalu melupakannya.
+  Tidak ada riwayat saat bergabung, tidak ada yang disimpan di server.
+- Batas: 90 huruf, satu baris, 8 pesan per 5 detik per pemain.
+- Jalur relay dan MQTT sama-sama menyiarkan chat; jalur cadangan `/api/presence` tidak.
+- Saat mengetik di kolom chat, WASD/Space tidak menggerakkan pemain.
+
 Dunia dibuat deterministik dari noise yang sama di setiap klien, jadi posisi yang dikirim
 ke server selalu masuk akal di klien lain tanpa perlu menyinkronkan world state.
 

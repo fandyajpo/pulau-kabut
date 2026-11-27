@@ -81,4 +81,36 @@ function fakeSocket(label) {
   assert.equal(client.color, '#fff');
 }
 
-console.log('room.test: 6 pemeriksaan lulus');
+// 7. Chat: disiarkan ke yang lain, tidak disimpan, dan dirapikan.
+{
+  const room = new Room('lobby');
+  const a = fakeSocket('a');
+  const b = fakeSocket('b');
+  const first = room.add(a, { name: 'Bima' });
+  room.add(b, { name: 'Citra' });
+
+  room.handle(first, JSON.stringify({ t: 'chat', m: '  halo   pulau!\n  ' }));
+  const chat = b.of('chat')[0];
+  assert.equal(chat.m, 'halo pulau!');
+  assert.equal(chat.name, 'Bima');
+  assert.equal(a.of('chat').length, 0);
+
+  // Batas laju chat: 8 pesan per 5 detik.
+  for (let i = 0; i < 20; i += 1) {
+    room.handle(first, JSON.stringify({ t: 'chat', m: `pesan ${i}` }));
+  }
+  assert.equal(b.of('chat').length, 8);
+
+  // Teks kosong dan terlalu panjang tidak disiarkan.
+  const empty = new Room('lobby');
+  const c = fakeSocket('c');
+  const d = fakeSocket('d');
+  const third = empty.add(c, { name: 'Daru' });
+  empty.add(d, { name: 'Elang' });
+  empty.handle(third, JSON.stringify({ t: 'chat', m: '   ' }));
+  empty.handle(third, JSON.stringify({ t: 'chat', m: 'x'.repeat(200) }));
+  assert.equal(d.of('chat').length, 1);
+  assert.equal(d.of('chat')[0].m.length, 90);
+}
+
+console.log('room.test: 7 pemeriksaan lulus');

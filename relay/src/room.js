@@ -19,6 +19,15 @@ function number(value, fallback = 0) {
   return Number.isFinite(parsed) ? Math.round(parsed * 100) / 100 : fallback;
 }
 
+/** Teks chat: satu baris, tanpa karakter kendali, maksimal 90 huruf. */
+function chatText(value) {
+  return String(value == null ? '' : value)
+    .replace(/[\u0000-\u001f\u007f]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 90);
+}
+
 function send(socket, payload) {
   try {
     socket.send(JSON.stringify(payload));
@@ -52,6 +61,8 @@ export class Room {
       color: text(meta.color, 9) || DEFAULT_COLOR,
       windowStart: Date.now(),
       count: 0,
+      chatWindow: 0,
+      chatCount: 0,
       seen: Date.now(),
     };
 
@@ -111,6 +122,22 @@ export class Room {
         },
         client.id,
       );
+      return;
+    }
+
+    if (message.t === 'chat') {
+      const body = chatText(message.m);
+      if (!body) return;
+
+      if (now - client.chatWindow > 5000) {
+        client.chatWindow = now;
+        client.chatCount = 0;
+      }
+      client.chatCount += 1;
+      if (client.chatCount > 8) return;
+
+      // Tidak disimpan ke mana pun: hanya disiarkan sekali ke pemain lain.
+      this.broadcast({ t: 'chat', id: client.id, name: client.name, m: body }, client.id);
     }
   }
 

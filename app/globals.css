@@ -455,3 +455,60 @@ button {
   font-size: 12px;
   color: #ffb4a8;
 }
+
+
+/* ------------------------------------------------------------------ chat */
+.chatbar {
+  position: absolute;
+  left: 50%;
+  bottom: max(96px, calc(env(safe-area-inset-bottom) + 84px));
+  transform: translateX(-50%);
+  z-index: 5;
+  display: flex;
+  gap: 8px;
+  width: min(360px, 72vw);
+  padding: 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(203, 233, 242, 0.2);
+  background: rgba(8, 21, 27, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.chatbar__input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+.chatbar__input::placeholder {
+  color: rgba(226, 241, 246, 0.42);
+}
+
+.chatbar__send {
+  flex: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(159, 232, 255, 0.18);
+  color: rgba(233, 246, 250, 0.92);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.chatbar__send:disabled {
+  opacity: 0.4;
+}
+
+@media (pointer: coarse) {
+  .chatbar {
+    bottom: max(150px, calc(env(safe-area-inset-bottom) + 136px));
+    width: min(340px, 78vw);
+  }
+}

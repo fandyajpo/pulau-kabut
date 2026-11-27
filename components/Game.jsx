@@ -42,6 +42,7 @@ export default function Game() {
   const [room, setRoom] = useState('lobby');
   const [color, setColor] = useState(COLORS[0]);
   const [joined, setJoined] = useState(false);
+  const [draft, setDraft] = useState('');
   const [muted, setMuted] = useState(false);
   const [ready, setReady] = useState(false);
   const [touch, setTouch] = useState(false);
@@ -114,6 +115,17 @@ export default function Game() {
     gameRef.current?.setJumpHeld(held);
   }, []);
 
+  const sendChat = useCallback(
+    (event) => {
+      event.preventDefault();
+      const text = draft.trim().slice(0, 90);
+      if (!text) return;
+      gameRef.current?.chat(text);
+      setDraft('');
+    },
+    [draft],
+  );
+
   const progress = stats.total ? stats.score / stats.total : 0;
   const crew = stats.names.slice(0, 3);
   const more = stats.names.length > crew.length ? ' …' : '';
@@ -148,6 +160,26 @@ export default function Game() {
       <div className="mist-meter" aria-hidden="true">
         <span className="mist-meter__fill" style={{ width: `${Math.round(progress * 100)}%` }} />
       </div>
+
+      {joined ? (
+        <form className="chatbar" onSubmit={sendChat}>
+          <input
+            className="chatbar__input"
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            placeholder="Katakan sesuatu…"
+            maxLength={90}
+            enterKeyHint="send"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
+            aria-label="Chat"
+          />
+          <button className="chatbar__send" type="submit" disabled={!draft.trim()}>
+            Kirim
+          </button>
+        </form>
+      ) : null}
 
       {joined ? (
         <footer className="hud hud--bottom">

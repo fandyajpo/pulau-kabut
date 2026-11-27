@@ -50,10 +50,15 @@ bertukar pesan JSON:
 | klien → server | `{"t":"hello","name":"Bima","color":"#9fe8ff"}` |
 | klien → server | `{"t":"s","x":1.2,"y":3.4,"z":5.6,"ry":0.7}` (maks 24 pesan/detik) |
 | klien → server | `{"t":"ping"}` |
+| klien → server | `{"t":"chat","m":"halo"}` (maks 90 huruf, 8 pesan / 5 detik) |
 | server → klien | `{"t":"welcome","id":"p1","room":"lobby"}` |
 | server → klien | `{"t":"roster","players":[…]}` |
 | server → klien | `{"t":"join","player":{…}}` / `{"t":"leave","id":"p1"}` |
 | server → klien | `{"t":"state","id":"p1","x":…,"y":…,"z":…,"ry":…}` |
+| server → klien | `{"t":"chat","id":"p1","name":"Bima","m":"halo"}` |
+
+Chat tidak disimpan: pesan hanya disiarkan ke pemain lain, tidak pernah ditulis ke
+storage Durable Object maupun ke tempat lain.
 
 Batasan: 24 pemain per room, 24 pesan per detik per pemain, socket yang diam 20 detik
 ditutup.
