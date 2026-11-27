@@ -31,6 +31,10 @@ juga menyalakan audio, karena browser mensyaratkan gestur pengguna).
 | Lari | Shift | — |
 | Zoom kamera | scroll | — |
 
+Lompat memakai **coyote time 0,12 detik** dan **jump buffer 0,14 detik**: menekan sedikit
+sebelum mendarat tetap dihitung, dan melepas tombol lebih awal membuat lompat lebih pendek.
+Kontrol di udara lebih lembut daripada di tanah, jadi tidak berhenti mendadak saat melompat.
+
 ## Struktur
 
 ```
@@ -141,7 +145,11 @@ tetap ringan di ponsel.
   atau melayang di lereng. Saat mendarat ada redaman lutut singkat.
 - Kamera ikut menghindari pohon dan batu (raycast 20x/detik lalu menarik mendekat), dan
   tempat spawn dicari yang tidak dekat pohon, jadi kamera tidak masuk ke dalam tajuk.
-- Warna yang kamu pilih di layar gabung dipakai untuk kemeja karakter itu sendiri.
+- Warna yang kamu pilih di layar gabung dipakai untuk kemeja karakter itu sendiri, dan
+  tiap penjelajah dapat nada kulit serta rambut sendiri dari hash namanya (6 × 6 pilihan),
+  jadi dua pemain tidak terlihat kembar.
+- Lantai pulau diberi 2.400 rumpun rumput instanced (variasi warna dan ukuran) supaya
+  permukaannya tidak polos.
 - Di studio `/human`, kamera otomatis mundur di layar potret supaya wajah/tangan/kaki tidak
   terpotong, dan panel kontrol dibatasi 34vh.
 
